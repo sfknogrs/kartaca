@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  mongo1:
+    container_name: mongo1
+    image: mongo:4.4
+    volumes:
+      - ./scripts/rs-init.sh:/scripts/rs-init.sh
+      - ./scripts/init.js:/scripts/init.js
+    networks:
+      mongo-network:
+        ipv4_address: 172.23.0.2
+    ports:
+      - 27017:27017
+    depends_on:
+      - mongo2
+      - mongo3
+    links:
+      - mongo2
+      - mongo3
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+
+  mongo2:
+    container_name: mongo2
+    image: mongo:4.4
+    volumes:
+      - ./scripts/rs-init.sh:/scripts/rs-init.sh
+    networks:
+      mongo-network:
+        ipv4_address: 172.23.0.3
+    ports:
+      - 27018:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+
+  mongo3:
+    container_name: mongo3
+    image: mongo:4.4
+    volumes:
+      - ./scripts/rs-init.sh:/scripts/rs-init.sh
+    networks:
+      mongo-network:
+        ipv4_address: 172.23.0.4
+    ports:
+      - 27019:27017
+    restart: always
+    entrypoint: [ "/bin/bash", "-c", "/usr/bin/mongod --bind_ip_all --replSet dbrs && ./scripts/rs-init.sh" ]
+
+  web:
+    container_name: web
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "4444:4444"
+    depends_on:
+      - mongo3
+    networks:
+      mongo-network:
+        ipv4_address: 172.23.0.5
+
+networks:
+  mongo-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/24
+          gateway: 172.23.0.1
