@@ -35,3 +35,28 @@ Kaldırıp yeniden kurmak için;
 - ./sil.sh
 - docker compose up
 - ./dbBaslat  <-- Opsiyonel
+
+
+Uyarı : dbBaslat.sh betik dosyasının başlatılması esnasında Linux Desktop sürümleri kullanılıyor ise sorun yaşanabilir. Bu durumda
+aşağıdaki komut direk çalıştırılabilir.
+
+- docker exec -it mongo1 mongo scripts/rs-init.sh
+
+Bu işlem sonrasında veritabanı replicaset kontrolü ve collection kontrolü aşağıdaki gibi yapılır.
+
+- docker exec -it mongo1 mongo
+çıktısı --> dbrs:PRIMARY>
+
+- docker exec -it mongo2 mongo
+- docker exec -it mongo3 mongo
+çıktısı --> dbrs:SECONDARY>
+
+
+Stajdb ve kolleksiyon kontrolü
+show dbs
+use stajdb
+db.iller.find()
+db.ulkeler.find()
+
+
+
