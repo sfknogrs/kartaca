@@ -1,0 +1,37 @@
+Hazırlanan mimari içerisinde aşağıda isimleri yazılı olan 3 adet mongo veritabı High available olarak tanımlanmıştır. 
+Tanımlamalar docker-compose.yml içerisinde yapılandırılmıştır. Yapılandırma içeriğinde veritbanları container olarak kurulmakta olup
+IP adres tanımlamaları yapılmıştır. Böylelikle veritabanını kullanarak işlem yapılması istenen uygulamalar(Python, go, vb) ile bağlantı
+sağlanması kolaylaştırılmıştır.
+
+İlgili container'lar çalışma sıralamasına göre web(Python) çalışması için gerekli olan paketler (Pymongo, Flask) Dockerfile içerisinde 
+tanımlanmıştır. Web container çalışması öncesinde rs-init.sh betik dosyasının çalışmasının sağlanması için gerekli olan mount işlemi
+için volume tanımlamaları yapılmış olup istenen port üzerinden çalışması sağlanmıştır.
+
+Container Devops operasyonun bir bütün olması nedeni ile python üzerinde uygulama hazırlanmıştır. 
+
+Veritabanı replicaSet Detayları:
+- mongo1
+- mongo2
+- mongo3
+
+Db koleksiyonları:
+- iller
+- ulkeler 
+
+
+Not: Yapılandırılan sistemin çalışması için "docker compose up" yapılması yeterlidir. Ancak bazı durumlarda(İşletim sistemi üzerindeki
+paket bağımlılıkları) rs-init.sh betik dosyasının çalışmadığı gözlemlenmiştir. Bu durumda "docker compose up" yapılması sonrasında 
+"./dbBaslat.sh" betik dosyasının çalıştırılması ile veritabanı üzerinde replicaSet yapılandırmaları ve veritabanı üzerine gerekli olan
+koleksiyonların eklenmesi sağlanmaktadır.
+
+Container'ların kaldırılması ve yeniden başlatılması durumu söz konusu olur ise "docker compose down" işlemi volume üzerinde bulunan
+alanları temizlemediği için "./sil.sh" betik dosyası oluşturulmuştur.
+
+Sistemin kurulumu için;
+- docker compose up
+- ./dbBaslat.sh  <-- Opsiyonel 
+
+Kaldırıp yeniden kurmak için;
+- ./sil.sh
+- docker compose up
+- ./dbBaslat  <-- Opsiyonel
